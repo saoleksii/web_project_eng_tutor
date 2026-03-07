@@ -4,7 +4,6 @@ const port = process.env.PORT
 const connectDB = require('./config/db')
 const logger = require('./middleware/logger')
 const not_found = require('./middleware/not_found')
-const is_admin = require('./middleware/auth_mw')
 
 const app = express()
 app.use(express.json())
