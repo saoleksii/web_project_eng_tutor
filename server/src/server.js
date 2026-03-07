@@ -1,12 +1,21 @@
 const express = require('express')
+const mongo_sanitize = require('express-mongo-sanitize')
 const path = require('path')
+const helmet = require('helmet')
 const port = process.env.PORT
 const connectDB = require('./config/db')
 const logger = require('./middleware/logger')
 const not_found = require('./middleware/not_found')
 
 const app = express()
+app.use(helmet)
 app.use(express.json())
+app.use((req, res, next) => {
+    if (req.body) {
+        req.body = mongo_sanitize.sanitize(req.body)
+    }
+    next()
+})
 app.use(express.static(path.join(__dirname, '..', '..', 'client')))
 app.use(logger)
 const user_routes = require('./routes/auth_routes')

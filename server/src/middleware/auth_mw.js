@@ -1,22 +1,23 @@
-const user_model = require("../models/User")
+const jwt = require('jsonwebtoken')
+const jwt_key = process.env.JWT_SECRET
 
 const is_admin = async (req, res, next) => {
-    try{
-        const admin_id = req.headers['admin-id']
-        if (!admin_id) {
-            return res.status(401).json({ message: "No admin ID provided" })
+    const auth_header = req.headers.authorization
+    const token = auth_header && auth_header.split(' ')[1]
+
+    if (!token) return res.status(401).json({ message: "Access denied: No token provided" })
+
+    try {
+        const decoded = jwt.verify(token, jwt_key)
+        
+        if (decoded.role !== 'admin') {
+            return res.status(403).json({ message: "Access denied: admins only" })
         }
 
-        const user = await user_model.findById(admin_id)
-
-        if (user && user.role === 'admin') {
-            next()
-        } else {
-            res.status(403).json({ message: "Access denied: admins only" })
-        }
-    }
-    catch(error) {
-        res.status(500).json({error: error.message})
+        req.user = decoded
+        next()
+    } catch (error) {
+        res.status(401).json({ message: "Invalid or expired token" })
     }
 }
 

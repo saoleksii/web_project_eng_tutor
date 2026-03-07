@@ -2,8 +2,10 @@ const user_model = require('../models/User')
 const bcrypt = require('bcryptjs')
 const crypto = require('crypto')
 const nodemailer = require('nodemailer')
+const jwt = require('jsonwebtoken')
 const mail_username = process.env.EMAIL_USERNAME
 const mail_pass = process.env.EMAIL_PASS
+const jwt_key = process.env.JWT_SECRET
 
 const transport = nodemailer.createTransport({
   host: "sandbox.smtp.mailtrap.io",
@@ -48,7 +50,7 @@ exports.register = async (req, res) => {
             </div>`
         })
 
-        res.status(201).json({ message: "Email confirmed!." })
+        res.status(201).json({ message: "Confirm your email" })
 
     } catch (error) {
         res.status(400).json({ message: "Registration error", error: error.message })
@@ -69,8 +71,12 @@ exports.login = async (req, res) => {
         const is_match = await bcrypt.compare(password, user.password)
         if (!is_match) return res.status(400).json({ message: "Invalid password" })
 
+        const token = jwt.sign(
+            { id: user._id, role: user.role }, jwt_key, { expiresIn: '2h'}
+        )
+
         res.status(200).json({ 
-            message: "Logged in successfully", 
+            message: "Logged in successfully", token,
             user: { id: user._id, role: user.role, name: user.name } 
         })
     } catch (error) {
