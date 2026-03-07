@@ -1,6 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const auth_controller = require('../controllers/admin_controller')
+const is_admin = require('../middleware/auth_mw')
+
+router.use(is_admin)
 
 router.post('/users', auth_controller.create_user)
 router.get('/users', auth_controller.get_all_users)
