@@ -6,7 +6,9 @@ const connectDB = require('./config/db')
 const app = express()
 app.use(express.json())
 app.use(express.static(path.join(__dirname, '..', '..', 'client')))
-const user_routes = require('./routes/auth_routes');
-app.use('/api/auth', user_routes);
+const user_routes = require('./routes/auth_routes')
+const admin_routes = require('./routes/admin_routes')
+app.use('/api/auth', user_routes)
+app.use('/api/admin', admin_routes)
 
 app.listen(port, () => console.log(`Server is running on port ${port}`))
