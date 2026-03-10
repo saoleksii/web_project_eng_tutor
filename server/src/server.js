@@ -3,12 +3,18 @@ const mongo_sanitize = require('express-mongo-sanitize')
 const path = require('path')
 const helmet = require('helmet')
 const port = process.env.PORT
+const client_url = process.env.CLIENT_URL
 const connectDB = require('./config/db')
 const logger = require('./middleware/logger')
 const not_found = require('./middleware/not_found')
+const cors = require('cors')
 
 const app = express()
-app.use(helmet)
+app.use(cors({
+    origin: client_url,
+    credentials: true
+}))
+app.use(helmet())
 app.use(express.json())
 app.use((req, res, next) => {
     if (req.body) {
@@ -18,10 +24,12 @@ app.use((req, res, next) => {
 })
 app.use(express.static(path.join(__dirname, '..', '..', 'client')))
 app.use(logger)
-const user_routes = require('./routes/auth_routes')
+const auth_routes = require('./routes/auth_routes')
 const admin_routes = require('./routes/admin_routes')
-app.use('/api/auth', user_routes)
+const user_routes = require('./routes/user_routes')
+app.use('/api/auth', auth_routes)
 app.use('/api/admin', admin_routes)
+app.use('/api', user_routes)
 app.use(not_found)
 app.use((err, req, res, next) => {
     res.status(err.status || 500).json({

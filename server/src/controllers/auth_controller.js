@@ -19,6 +19,7 @@ const transport = nodemailer.createTransport({
 exports.register = async (req, res) => {
     try {
         const { name, email, password, phone, role } = req.body
+        const isActive = role === 'tutor' ? false : true
 
         const hashed_password = await bcrypt.hash(password, 10)
         const verif_token = crypto.randomBytes(32).toString('hex')
@@ -29,7 +30,8 @@ exports.register = async (req, res) => {
             password: hashed_password,
             phone,
             role: role || 'student',
-            verif_token
+            verif_token,
+            is_active: isActive
         })
 
         await new_user.save()

@@ -12,7 +12,12 @@ const user_schema = new mongoose.Schema({
     },
     is_verified: { type: Boolean, default: false },
     verif_token: { type: String },
-    is_active: { type: Boolean, default: true }
+    is_active: { type: Boolean, default: true },
+    photo: { type: String, default: '' },
+    experience: { type: String, default: '' },
+    description: { type: String, default: '' },
+    price: { type: Number, default: 0 },
+    education: { type: String, default: '' }
 }, { 
     timestamps: true
 });
