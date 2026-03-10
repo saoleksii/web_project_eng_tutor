@@ -1,2 +1,2 @@
 # web_project_eng_tutor
-Full stack web application built with node.js, vue.js, mongodb.
+Full stack web application built with node.js, react.js, mongodb both REST and graphql
