@@ -1,18 +1,17 @@
 import React, { useState } from 'react'
 
 const TutorCard = ({ tutor }) => {
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false)
     const formatDescription = (text) => {
-        if (!text) return "No description provided.";
-        if (text.length <= 80 || isExpanded) return text;
-        return text.substring(0, 140) + "...";
+        if (text.length <= 80 || isExpanded) return text
+        return text.substring(0, 140) + "..."
     };
     return (
         <div className="card shadow-sm mb-4 w-100" style={{ maxWidth: '800px' }}>
             <div className="row g-0">
                 <div className="col-md-3 p-3">
-                    <img 
-                        src={tutor.photo || 'https://placehold.co/150'} 
+                    <img
+                        src={tutor.photo || `https://ui-avatars.com/api/?name=${tutor.name}`}
                         alt={tutor.name} 
                         className="img-fluid rounded border"
                         style={{ width: '150px', height: '150px', objectFit: 'cover' }}

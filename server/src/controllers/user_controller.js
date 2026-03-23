@@ -3,7 +3,7 @@ const user_model = require('../models/User')
 exports.get_tutors = async (req, res) => {
     try{
         const tutors = await user_model.find({role: 'tutor', is_active: true}).select(
-            'name experience description price education'
+            'name experience description price education photo'
         )
         res.status(200).json(tutors)
     } catch(error) {

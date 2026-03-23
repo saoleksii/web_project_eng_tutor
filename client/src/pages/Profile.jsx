@@ -36,6 +36,19 @@ const Profile = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handlePhotoChange = async (e) => {
+        const file = e.target.files[0]
+        const uploadData = new FormData()
+        uploadData.append('photo', file)
+        try {
+            const res = await api.post('/upload', uploadData, {headers: { 'Content-Type': 'multipart/form-data' }})
+            setFormData({ ...formData, photo: res.data.photo_url })
+            alert("Photo saved!")
+        } catch (err) {
+            console.error("Upload error", err)
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -68,22 +81,14 @@ const Profile = () => {
                             <form onSubmit={handleSubmit}>
                                 <div className="row mb-4">
                                     <div className="col-md-4 text-center">
-                                        
                                         <img 
-                                            src={formData.photo || 'https://ui-avatars.com/api/?name=' + formData.name} 
-                                            alt="Avatar" 
-                                            className="img-thumbnail rounded-circle mb-2"
-                                            style={{ width: '130px', height: '130px', objectFit: 'cover' }}
-                                            onError={(e) => { e.target.src = 'https://www.w3schools.com/howto/img_avatar.png' }} 
+                                            src={formData.photo || `https://ui-avatars.com/api/?name=${formData.name}`} 
+                                            alt="Avatar"
+                                            className="img-thumbnail rounded-circle mb-3 shadow-sm"
+                                            style={{ width: '150px', height: '150px', objectFit: 'cover', border: '3px solid #f8f9fa' }}
+                                            onError={(e) => { e.target.src = 'https://www.w3schools.com/howto/img_avatar.png' }}
                                         />
-                                        <input 
-                                            type="text" 
-                                            name="photo" 
-                                            placeholder="URL photo" 
-                                            className="form-control form-control-sm"
-                                            value={formData.photo || ''}
-                                            onChange={handleChange}
-                                        />
+                                        <input type="file" className="form-control form-control-sm" onChange={handlePhotoChange}/>
                                     </div>
                                     <div className="col-md-8">
                                         <div className="mb-3">
