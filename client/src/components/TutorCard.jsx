@@ -1,11 +1,43 @@
 import React, { useState } from 'react'
+import api from '../api/axios'
+import { useNavigate } from 'react-router-dom'
 
 const TutorCard = ({ tutor }) => {
+    const navigate = useNavigate()
     const [isExpanded, setIsExpanded] = useState(false)
+    const [showForm, setShowForm] = useState(false)
+    const [bookingData, setBookingData] = useState({ date: '', time: '' })
+    const [error, setError] = useState('')
+    const [success, setSuccess] = useState('')
+
+    const handleBooking = async (e) => {
+        e.preventDefault()
+        setError('')
+        setSuccess('')
+
+        const token = localStorage.getItem('token')
+        if (!token) {
+            navigate('/login')
+            return
+        }
+
+        try {
+            await api.post('/bookings', {
+                tutor_id: tutor._id,
+                date: bookingData.date,
+                time: bookingData.time
+            })
+            setSuccess('Lesson booked successfully!')
+            setBookingData({ date: '', time: '' })
+            setShowForm(false)
+        } catch (err) {
+            setError(err.response?.data?.message || 'Booking error')
+        }
+    }
     const formatDescription = (text) => {
         if (text.length <= 80 || isExpanded) return text
         return text.substring(0, 140) + "..."
-    };
+    }
     return (
         <div className="card shadow-sm mb-4 w-100" style={{ maxWidth: '800px' }}>
             <div className="row g-0">
@@ -56,8 +88,34 @@ const TutorCard = ({ tutor }) => {
                     </div>
                 </div>
                 <div className="d-flex justify-content-between align-items-center p-3">
-                    <button className="btn btn-primary px-4 shadow-sm fw-bold">Book a lesson</button>
+                    <button onClick={() => setShowForm(!showForm)} className="btn btn-primary px-4 shadow-sm fw-bold">Book a lesson</button>
                 </div>
+                {showForm && (
+                    <div className="p-3 border-top bg-light">
+                        {error && <div className="alert alert-danger py-2">{error}</div>}
+                        {success && <div className="alert alert-success py-2">{success}</div>}
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            <h5 className="mb-0 text-dark fw-bold">Please select time</h5>
+                                <button 
+                                    type="button" 
+                                    className="btn-close shadow-none"
+                                    aria-label="Close"
+                                    onClick={() => setShowForm(false)}
+                                />
+                        </div>
+                        <form onSubmit={handleBooking}>
+                            <div className="mb-3">
+                            <label className="form-label">Select Date</label>
+                            <input type="date" className="form-control" required />
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label">Select Time</label>
+                                <input type="time" className="form-control" required />
+                            </div>
+                            <button type="submit" className="btn btn-success w-100">Confirm Booking</button>
+                        </form>
+                    </div>
+                )}
             </div>
         </div>
     )

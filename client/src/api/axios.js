@@ -15,7 +15,12 @@ instance.interceptors.request.use((config) => {
 instance.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+        console.error(
+            `${error.config.method.toUpperCase()} ${error.config.url}`,
+            '\nStatus:', error.response?.status,
+            '\nMessage:', error.response?.data?.message || error.message
+        )
+        if (error.response && (error.response.status === 401)) {
             localStorage.clear();
             window.location.href = '/login';
         }

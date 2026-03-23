@@ -51,9 +51,7 @@ exports.register = async (req, res) => {
                 </a>
             </div>`
         })
-
         res.status(201).json({ message: "Confirm your email" })
-
     } catch (error) {
         res.status(400).json({ message: "Registration error", error: error.message })
     }
@@ -63,20 +61,15 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body
         const user = await user_model.findOne({ email })
-
         if (!user) return res.status(404).json({ message: "User not found" })
-        
         if (!user.is_verified) {
             return res.status(401).json({ message: "Please verify your email first" })
         }
-
         const is_match = await bcrypt.compare(password, user.password)
         if (!is_match) return res.status(400).json({ message: "Invalid password" })
-
         const token = jwt.sign(
             { id: user._id, role: user.role }, jwt_key, { expiresIn: '2h'}
         )
-
         res.status(200).json({ 
             message: "Logged in successfully", token,
             user: { id: user._id, role: user.role, name: user.name } 
