@@ -20,7 +20,8 @@ instance.interceptors.response.use(
             '\nStatus:', error.response?.status,
             '\nMessage:', error.response?.data?.message || error.message
         )
-        if (error.response && (error.response.status === 401)) {
+        const isLoginRoute = error.config.url.includes('/auth/login')
+        if (error.response?.status === 401 && !isLoginRoute) {
             localStorage.clear();
             window.location.href = '/login';
         }

@@ -22,8 +22,8 @@ function Register() {
         if(!isValidPhoneNumber('+' + formData.phone)) return setError("Phone is not valid")
 
         try {
-            await api.post('/auth/register', formData)
-            alert("Registration success, login")
+            const res = await api.post('/auth/register', formData)
+            alert(res.data.message)
             redirect('/login')
         } catch (err) {
             setError(err.response?.data?.message || "Registration error")

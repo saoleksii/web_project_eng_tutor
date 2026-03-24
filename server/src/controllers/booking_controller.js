@@ -5,12 +5,12 @@ exports.get_bookings = async (req, res) => {
     try{
         const { id, role } = req.user
         const filter = role == 'student' 
-            ? { student: id } 
-            : { tutor: id }
+            ? { student_id: id } 
+            : { tutor_id: id }
         const bookings = await booking_model
             .find(filter)
-            .populate('student', 'name email phone')
-            .populate('tutor', 'name email phone')
+            .populate('student_id', 'name email phone')
+            .populate('tutor_id', 'name email phone')
         res.status(200).json(bookings)
     } catch (error) {
         res.status(500).json({ message: "Error fetching bookings", error: error.message })
@@ -31,8 +31,7 @@ exports.add_booking = async (req, res) => {
             student_id: req.user.id,
             tutor_id,
             date,
-            time,
-            meeting_link: tutor.meeting_link
+            time
         })
         await new_booking.save()
         res.status(201).json(new_booking)
@@ -44,7 +43,7 @@ exports.add_booking = async (req, res) => {
 exports.update_booking_status = async(req, res) => {
     try{
         const id = req.params.id
-        const status = req.body.status
+        const { status, meeting_link } = req.body
         const booking = await booking_model.findById(id)
         if (!booking) return res.status(404).json({ message: "Booking not found" })
         if (status == 'confirmed' && req.user.role !== 'tutor') {
@@ -57,8 +56,10 @@ exports.update_booking_status = async(req, res) => {
             return res.status(403).json({ message: "Not your booking" })
         }
         booking.status = status
+        if (meeting_link) booking.meeting_link = meeting_link
         await booking.save()
-        res.status(200).json({status:booking.status})
+        await booking.save()
+        res.status(200).json(booking)
 
     } catch(error){
         res.status(500).json({ message: "Update booking status error", error: error.message })

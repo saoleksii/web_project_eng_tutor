@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import api from '../api/axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react'
+import api from '../api/axios'
+import { useNavigate } from 'react-router-dom'
 
 const Profile = () => {
     const navigate = useNavigate()
@@ -17,24 +17,24 @@ const Profile = () => {
         education: '',
         experience: '',
         photo: ''
-    });
+    })
 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await api.get('/user');
+                const res = await api.get('/user')
                 setFormData(res.data)
             } catch (err) {
-                console.error("Loading error:", err);
-                setError('Failed to load profile.');
+                console.error("Loading error:", err)
+                setError('Failed to load profile.')
             }
         };
-        fetchProfile();
-    }, []);
+        fetchProfile()
+    }, [])
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+        setFormData({ ...formData, [e.target.name]: e.target.value })
+    }
 
     const handlePhotoChange = async (e) => {
         const file = e.target.files[0]
@@ -50,18 +50,18 @@ const Profile = () => {
     }
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setSuccess('');
+        e.preventDefault()
+        setError('')
+        setSuccess('')
 
         try {
-            await api.patch('/user', formData);
-            setSuccess('Profile updated!');
-            
-            const storedUser = JSON.parse(localStorage.getItem('user'));
-            localStorage.setItem('user', JSON.stringify({ ...storedUser, name: formData.name }));
+            await api.patch('/user', formData)
+            setSuccess('Profile updated!')
+        
+            const storedUser = JSON.parse(localStorage.getItem('user'))
+            localStorage.setItem('user', JSON.stringify({ ...storedUser, name: formData.name }))
         } catch (err) {
-            setError(err.response?.data?.message || 'Update error');
+            setError(err.response?.data?.message || 'Update error')
         }
     };
 
@@ -137,7 +137,7 @@ const Profile = () => {
                 </div>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default Profile;
+export default Profile

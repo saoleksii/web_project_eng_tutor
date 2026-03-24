@@ -90,13 +90,14 @@ const TutorCard = ({ tutor }) => {
                 <div className="d-flex justify-content-between align-items-center p-3">
                     <button onClick={() => setShowForm(!showForm)} className="btn btn-primary px-4 shadow-sm fw-bold">Book a lesson</button>
                 </div>
+                {success && <div className="alert alert-success py-2">{success}</div>}
+
                 {showForm && (
                     <div className="p-3 border-top bg-light">
                         {error && <div className="alert alert-danger py-2">{error}</div>}
-                        {success && <div className="alert alert-success py-2">{success}</div>}
                         <div className="d-flex justify-content-between align-items-center mb-3">
                             <h5 className="mb-0 text-dark fw-bold">Please select time</h5>
-                                <button 
+                                <button
                                     type="button" 
                                     className="btn-close shadow-none"
                                     aria-label="Close"
@@ -106,11 +107,16 @@ const TutorCard = ({ tutor }) => {
                         <form onSubmit={handleBooking}>
                             <div className="mb-3">
                             <label className="form-label">Select Date</label>
-                            <input type="date" className="form-control" required />
+                            <input type="date" className="form-control" required 
+                                value={bookingData.date}
+                                onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}/>
                             </div>
                             <div className="mb-3">
                                 <label className="form-label">Select Time</label>
-                                <input type="time" className="form-control" required />
+                                <input type="time" className="form-control" required 
+                                    value={bookingData.time}
+                                    onChange={(e) => setBookingData({ ...bookingData, time: e.target.value })}
+                                />
                             </div>
                             <button type="submit" className="btn btn-success w-100">Confirm Booking</button>
                         </form>
