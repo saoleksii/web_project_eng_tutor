@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import api from '../api/axios'
 import { useNavigate } from 'react-router-dom'
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
+import { isValidPhoneNumber } from 'libphonenumber-js'
 
 const Profile = () => {
     const navigate = useNavigate()
@@ -55,6 +58,7 @@ const Profile = () => {
         setSuccess('')
 
         try {
+            if(!isValidPhoneNumber('+' + formData.phone)) return setError("Phone is not valid")
             await api.patch('/user', formData)
             setSuccess('Profile updated!')
         
@@ -96,9 +100,21 @@ const Profile = () => {
                                             <input type="text" name="name" className="form-control" value={formData.name} onChange={handleChange} required />
                                         </div>
                                         <div className="mb-3">
+                                            <label className="form-label fw-bold">Phone</label>
+                                            <PhoneInput
+                                                country="ua"
+                                                value={formData.phone}
+                                                onChange={(value) => setFormData({...formData, phone: value})}
+                                                inputClass="form-control w-100"
+                                                containerClass="w-100"
+                                                buttonClass="border rounded-start"
+                                                inputStyle={{ width: '100%', height: '38px' }}
+                                            />
+                                        </div>
+                                        <div className="mb-3">
                                             <label className="form-label fw-bold">Email</label>
                                             <input type="email" className="form-control bg-light" value={formData.email} disabled />
-                                            <small className="text-muted">Email can't be changed</small>
+                                            <small className="text-muted">Only administrators can change email</small>
                                         </div>
                                     </div>
                                 </div>

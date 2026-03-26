@@ -1,4 +1,5 @@
 const user_model = require('../models/User')
+const booking_model = require('../models/Booking')
 const bcrypt = require('bcryptjs')
 
 exports.create_user = async (req, res) => {
@@ -67,5 +68,26 @@ exports.update_user = async (req, res) => {
     }
     catch(error){
         res.status(400).json({error: error.message})
+    }
+}
+
+exports.get_all_bookings = async (req, res) => {
+    try {
+        const bookings = await booking_model.find()
+            .populate('student_id', 'name email')
+            .populate('tutor_id', 'name email')
+        res.status(200).json(bookings)
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
+exports.delete_booking = async (req, res) => {
+    try {
+        const deleted = await booking_model.findByIdAndDelete(req.params.id)
+        if (!deleted) return res.status(404).json({ message: "Booking not found" })
+        res.status(200).json({ message: "Booking deleted" })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
     }
 }

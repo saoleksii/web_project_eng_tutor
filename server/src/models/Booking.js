@@ -15,7 +15,7 @@ const booking_schema = new mongoose.Schema({
     time: { type: String, required: true },
     status: {
         type: String,
-        enum: ['pending', 'confirmed', 'cancelled'],
+        enum: ['pending', 'confirmed', 'cancelled', 'finished'],
         default: 'pending'
     },
     meeting_link: { type: String, default: '' }

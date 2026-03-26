@@ -26,9 +26,14 @@ const MyBookings = () => {
                 status,
                 meeting_link: meetingLinks[id] || ''
             })
+            if (status === 'finished') {
+                setBookings(prev => prev.filter(booking => booking._id !== id))
+            }
+            else {
             setBookings(prev => prev.map(b =>
                 b._id === id ? res.data : b
             ))
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Update error')
         }
@@ -92,6 +97,13 @@ const MyBookings = () => {
                                         Confirm
                                     </button>
                                 </div>
+                            )}
+                            {user?.role === 'tutor' && booking.meeting_link && booking.status === 'confirmed' && (
+                                <button
+                                    className="btn btn-sm btn-outline-success mt-2 me-2"
+                                    onClick={() => handleUpdateStatus(booking._id, 'finished')}>
+                                    Finish
+                                </button>
                             )}
 
                             {booking.status !== 'cancelled' && (

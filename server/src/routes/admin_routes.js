@@ -10,5 +10,7 @@ router.get('/users', auth_controller.get_all_users)
 router.get('/users/:id', auth_controller.get_one_user)
 router.delete('/users/:id', auth_controller.delete_user)
 router.patch('/users/:id', auth_controller.update_user)
+router.get('/bookings', auth_controller.get_all_bookings)
+router.delete('/bookings/:id', auth_controller.delete_booking)
 
 module.exports = router
