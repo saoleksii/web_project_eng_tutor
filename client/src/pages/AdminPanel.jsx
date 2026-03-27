@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../api/axios'
+import CreateUserForm from '../components/CreateUserForm'
 
 const AdminPanel = () => {
     const [activeTab, setActiveTab] = useState('users')
@@ -7,12 +8,12 @@ const AdminPanel = () => {
     const [bookings, setBookings] = useState([])
     const [error, setError] = useState('')
     const [editingUser, setEditingUser] = useState(null)
+    const [isCreatingUser, setIsCreatingUser] = useState(false)
 
     useEffect(() => {
         if (activeTab === 'users') loadUsers()
         if (activeTab === 'bookings') loadBookings()
     }, [activeTab])
-
     const loadUsers = async () => {
         try {
             const res = await api.get('/admin/users')
@@ -21,7 +22,6 @@ const AdminPanel = () => {
             setError('Failed to load users')
         }
     }
-
     const loadBookings = async () => {
         try {
             const res = await api.get('/admin/bookings')
@@ -30,7 +30,10 @@ const AdminPanel = () => {
             setError('Failed to load bookings')
         }
     }
-
+    const handleUserCreated = (newUserData) => {
+        setUsers(prev => [newUserData, ...prev])
+        setIsCreatingUser(false)
+    }
     const handleDeleteUser = async (id) => {
         if (!window.confirm('Delete this user?')) return
         try {
@@ -100,6 +103,7 @@ const AdminPanel = () => {
 
             {activeTab === 'users' && (
                 <div>
+                    
                     {editingUser && (
                         <div className="card mb-4 border shadow-sm">
                             <div className="card-body">
@@ -200,7 +204,23 @@ const AdminPanel = () => {
                     </table>
                 </div>
             )}
-
+            <div className="mb-3 d-flex justify-content-end">
+                <button 
+                    className="btn btn-success" 
+                    onClick={() => {
+                        setIsCreatingUser(true)
+                        setEditingUser(null) 
+                    }}>
+                    + Add New User
+                </button>
+            </div>
+            {isCreatingUser && (
+                <CreateUserForm 
+                    onSuccess={handleUserCreated} 
+                    onCancel={() => setIsCreatingUser(false)} 
+                />
+            )}
+            
             {/* bookings */}
             {activeTab === 'bookings' && (
                 <table className="table shadow-sm">

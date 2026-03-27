@@ -30,18 +30,6 @@ exports.get_all_users = async (req, res) => {
     }
 }
 
-exports.get_one_user = async (req, res) => {
-    try{
-        const user_id = req.params.id
-        const user = await user_model.findById(user_id).select('-password')
-        if(!user) return res.status(404).json({message: "User not found"})
-        res.status(200).json({id: user_id, user: user})
-    }
-    catch (error){
-        res.status(400).json({error: error.message})
-    }
-}
-
 exports.delete_user = async (req, res) => {
     try{
         const user_id = req.params.id
