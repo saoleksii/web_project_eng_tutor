@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import api from '../api/axios'
 
 const AdminPanel = () => {
@@ -72,7 +72,7 @@ const AdminPanel = () => {
     }
 
     const getStatusBadge = (status) => {
-        const map = { pending: 'warning', confirmed: 'success', cancelled: 'danger' }
+        const map = { pending: 'warning', confirmed: 'success', cancelled: 'danger', finished: 'success' }
         return <span className={`badge bg-${map[status]}`}>{status}</span>
     }
 
@@ -81,7 +81,6 @@ const AdminPanel = () => {
             <h4 className="fw-bold mb-4">Admin Panel</h4>
             {error && <div className="alert alert-danger">{error}</div>}
 
-            {/* tabs */}
             <ul className="nav nav-tabs mb-4">
                 <li className="nav-item">
                     <button
@@ -99,7 +98,6 @@ const AdminPanel = () => {
                 </li>
             </ul>
 
-            {/* users tab */}
             {activeTab === 'users' && (
                 <div>
                     {editingUser && (
@@ -202,7 +200,7 @@ const AdminPanel = () => {
                     </table>
                 </div>
             )}
-            
+
             {/* bookings */}
             {activeTab === 'bookings' && (
                 <table className="table shadow-sm">

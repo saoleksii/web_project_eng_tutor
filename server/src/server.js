@@ -1,10 +1,10 @@
+const connectDB = require('./config/db')
 const express = require('express')
 const mongo_sanitize = require('express-mongo-sanitize')
 const path = require('path')
 const helmet = require('helmet')
 const port = process.env.PORT
 const client_url = process.env.CLIENT_URL
-const connectDB = require('./config/db')
 const logger = require('./middleware/logger')
 const not_found = require('./middleware/not_found')
 const cors = require('cors')
@@ -47,4 +47,8 @@ app.use((err, req, res, next) => {
     })
 })
 
-app.listen(port, () => console.log(`Server is running on port ${port}`))
+const start = async () => {
+    await connectDB()
+    app.listen(port, () => console.log(`Server running on port ${port}`))
+}
+start()

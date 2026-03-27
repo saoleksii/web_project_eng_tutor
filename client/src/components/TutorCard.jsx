@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import api from '../api/axios'
 import { useNavigate } from 'react-router-dom'
 
@@ -39,7 +39,7 @@ const TutorCard = ({ tutor }) => {
         return text.substring(0, 140) + "..."
     }
     return (
-        <div className="card shadow-sm mb-4 w-100" style={{ maxWidth: '800px' }}>
+        <div className="card shadow-sm mb-4 w-100">
             <div className="row g-0">
                 <div className="col-md-3 p-3">
                     <img
