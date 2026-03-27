@@ -1,42 +1,26 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
+import { useSearchParams } from 'react-router-dom'
 import TutorCard from '../components/TutorCard'
 
 function Start() {
     const [tutorData, setTutorData] = useState([])
-    const [sortOrder, setSortOrder] = useState(null)
-    const [searchTerm, setSearchTerm] = useState('')
-    const [debouncedTerm, setDebouncedTerm] = useState('')
-
+    const [params, setParams] = useSearchParams()
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedTerm(searchTerm)
-        }, 500)
-        return () => clearTimeout(timer)
-    }, [searchTerm])
-    useEffect(() => {
-        const fetchTutors = async() => {
-            try {
-                const { data } = await api.get('/tutors')
-                setTutorData(data)
-            } catch(err) {
-                console.error("Failed to download data")
-            }
-        }
-        fetchTutors()
+        api.get('/tutors').then(res => setTutorData(res.data))
     }, [])
-    const filteredTutors = tutorData.filter(tutor => {
-        if (!debouncedTerm) return true
-        return (tutor.name || "").toLowerCase().startsWith(debouncedTerm.toLowerCase())
-    })
-    const displayTutors = [...filteredTutors].sort((a, b) => {
-        if (!sortOrder) return 0
-        const priceA = Number(a.price) || 0
-        const priceB = Number(b.price) || 0
-        return sortOrder === 'asc' ? priceA - priceB : priceB - priceA
-    })
-    const handleSort = () => {
-        setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))
+    const query = {
+        name: params.get('name') || '',
+        price: params.get('maxPrice') || '',
+        sort: params.get('sort') || ''
+    }
+    const displayTutors = tutorData
+        .filter(t => t.name.toLowerCase().startsWith(query.name.toLowerCase()))
+        .filter(t => !query.price || t.price <= query.price)
+        .sort((a, b) => !query.sort ? 0 : (query.sort === 'asc' ? a.price - b.price : b.price - a.price))
+    const update = (key, val) => {
+        val ? params.set(key, val) : params.delete(key)
+        setParams(params)
     }
 
     return (
@@ -49,12 +33,21 @@ function Start() {
                         type="text"
                         className="form-control form-control-lg shadow-sm" 
                         placeholder="Search for a tutor"
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        value={query.name}
+                        onChange={e => update('name', e.target.value)}s
+                    />
+                    <input
+                        type="number"
+                        className="form-control shadow-sm"
+                        style={{ maxWidth: '150px' }}
+                        placeholder="Max price"
+                        value={query.price}
+                        onChange={e => update('maxPrice', e.target.value)}
                     />
                     <button
                         type=''
                         className="btn btn-outline-primary d-flex align-items-center fw-bold"
-                        onClick={handleSort}
+                        onClick={() => update('sort', query.sort === 'asc' ? 'desc' : 'asc')}
                         >
                         Filter
                     </button>
