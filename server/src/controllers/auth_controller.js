@@ -19,6 +19,9 @@ const transport = nodemailer.createTransport({
 exports.register = async (req, res) => {
     try {
         const { name, email, password, phone, role } = req.body
+        if (await user_model.findOne({ email })){
+            return res.status(401).json({ message: "This email is registered, login" })
+        }
         const isActive = role === 'tutor' ? false : true
 
         const hashed_password = await bcrypt.hash(password, 10)

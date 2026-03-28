@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const user_schema = new mongoose.Schema({
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true, trim: true, lowercase: true },
+    email: { type: String, required: true, unique: true, trim: true, lowercase: true, match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Not valid email'] },
     password: { type: String, required: true },
     phone: { type: String, required: true, unique: true },
     role: {
@@ -14,10 +14,10 @@ const user_schema = new mongoose.Schema({
     verif_token: { type: String },
     is_active: { type: Boolean, default: true },
     photo: { type: String, default: '' },
-    experience: { type: String, default: '' },
-    description: { type: String, default: '' },
-    price: { type: Number, default: 0 },
-    education: { type: String, default: '' }
+    experience: { type: String},
+    description: { type: String},
+    price: { type: Number},
+    education: { type: String}
 }, { 
     timestamps: true
 });

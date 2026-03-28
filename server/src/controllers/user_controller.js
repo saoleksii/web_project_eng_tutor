@@ -13,9 +13,7 @@ exports.get_tutors = async (req, res) => {
 
 exports.get_user = async (req, res) => {
     try {
-        const user = await user_model.findById(req.user.id).select(
-            '-password'
-        )
+        const user = await user_model.findById(req.user.id).select('-password')
         
         if (!user) return res.status(404).json({ message: "User not found" })
         

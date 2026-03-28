@@ -33,10 +33,6 @@ app.use((req, res, next) => {
     next()
 })
 
-
-
-
-
 const start = async () => {
     try{
         await connectDB()
@@ -55,12 +51,28 @@ const start = async () => {
             app.use('/api', upload_routes)
         } else{
             console.log("API MODE: GRAPHQL")
-            const typeDefs = require('./graphql/typeDefs')
-            const resolvers = require('./graphql/resolvers')
+            const { verify_email } = require('./controllers/auth_controller');
+            const jwt = require('jsonwebtoken')
+            const typeDefs = require('./graphql/typeDefs/index')
+            const resolvers = require('./graphql/resolvers/index')
             const server = new ApolloServer({ typeDefs, resolvers, })
             await server.start()
+            app.get('/verify/:token', verify_email);
             app.use('/graphql', expressMiddleware(server, {
-                context: async ({ req }) => ({ req })
+                context: async ({ req }) => {
+                    const authHeader = req.headers.authorization;
+                    if(authHeader){
+                        const auth_token = req.headers.authorization
+                        const token = auth_token.split(' ')[1]
+                        try{
+                            const user = jwt.verify(token, process.env.JWT_SECRET)
+                            return { user }
+                        } catch(error){
+                            console.log("Invalid token")
+                        }
+                    }
+                    
+                }
             }))
         }
         app.use(not_found)

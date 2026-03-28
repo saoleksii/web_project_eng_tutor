@@ -21,12 +21,13 @@ instance.interceptors.response.use(
             '\nMessage:', error.response?.data?.message || error.message
         )
         const isLoginRoute = error.config.url.includes('/auth/login')
-        if (error.response?.status === 401 && !isLoginRoute) {
-            localStorage.clear();
-            window.location.href = '/login';
+        const isRegisterRoute = error.config.url.includes('/auth/register')
+        if (error.response?.status === 401 && !isLoginRoute && !isRegisterRoute) {
+            localStorage.clear()
+            window.location.href = '/login'
         }
-        return Promise.reject(error);
+        return Promise.reject(error)
     }
-);
+)
 
 export default instance
