@@ -7,8 +7,8 @@ const Booking = `#graphql
     }
     type Booking {
         _id: ID!
-        student: User!
-        tutor: User!
+        student_id: User!
+        tutor_id: User!
         date: String!
         time: String!
         status: BookingStatus!
@@ -19,7 +19,7 @@ const Booking = `#graphql
     }
     type Mutation {
         add_booking(tutor_id: ID!, date: String!, time: String!): Booking!
-        update_booking_status(id: ID!, status: BookingStatus!): Booking!
+        update_booking_status(id: ID!, status: BookingStatus!, meeting_link: String): Booking!
     }
 `
 

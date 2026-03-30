@@ -1,28 +1,30 @@
 import { useState, useEffect } from 'react'
-import api from '../api/axios'
+import { useApi } from '../App'
 
 const MyBookings = () => {
+    const { getBookings, updateBooking } = useApi()
     const [bookings, setBookings] = useState([])
     const [error, setError] = useState('')
     const user = JSON.parse(localStorage.getItem('user'))
     const [meetingLinks, setMeetingLinks] = useState({})
 
     useEffect(() => {
-        fetchBookings()
-    }, [])
-
-    const fetchBookings = async () => {
-        try {
-            const res = await api.get('/bookings')
-            setBookings(res.data)
-        } catch (err) {
-            setError('Failed to load bookings.')
+        const fetchBookings = async () => {
+            try {
+                const data = await getBookings()
+                setBookings(data)
+            } catch (err) {
+                setError('Failed to load bookings.')
+            }
         }
-    }
+        fetchBookings()
+    }, [getBookings])
+
+    
 
     const handleUpdateStatus = async (id, status) => {
         try {
-            const res = await api.patch(`/bookings/${id}`, { 
+            const updated = await updateBooking(id, { 
                 status,
                 meeting_link: meetingLinks[id] || ''
             })
@@ -31,7 +33,7 @@ const MyBookings = () => {
             }
             else {
             setBookings(prev => prev.map(b =>
-                b._id === id ? res.data : b
+                b._id === id ? updated : b
             ))
             }
         } catch (err) {

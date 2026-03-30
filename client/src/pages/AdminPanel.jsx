@@ -1,8 +1,13 @@
 import { useState, useEffect } from 'react'
-import api from '../api/axios'
+import { useApi } from '../App'
 import CreateUserForm from '../components/CreateUserForm'
 
 const AdminPanel = () => {
+    const {
+        adminGetAllUsers, adminGetAllBookings,
+        adminUpdateUser, adminDeleteUser, adminDeleteBooking
+    } = useApi()
+
     const [activeTab, setActiveTab] = useState('users')
     const [users, setUsers] = useState([])
     const [bookings, setBookings] = useState([])
@@ -11,25 +16,24 @@ const AdminPanel = () => {
     const [isCreatingUser, setIsCreatingUser] = useState(false)
 
     useEffect(() => {
+        const loadBookings = async () => {
+            try {
+                setBookings(await adminGetAllBookings())
+            } catch (err) {
+                setError('Failed to load bookings')
+            }
+        }
+        const loadUsers = async () => {
+            try {
+                setUsers(await adminGetAllUsers())
+            } catch (err) {
+                setError('Failed to load users')
+            }
+        }
         if (activeTab === 'users') loadUsers()
         if (activeTab === 'bookings') loadBookings()
-    }, [activeTab])
-    const loadUsers = async () => {
-        try {
-            const res = await api.get('/admin/users')
-            setUsers(res.data)
-        } catch (err) {
-            setError('Failed to load users')
-        }
-    }
-    const loadBookings = async () => {
-        try {
-            const res = await api.get('/admin/bookings')
-            setBookings(res.data)
-        } catch (err) {
-            setError('Failed to load bookings')
-        }
-    }
+    }, [activeTab, adminGetAllBookings, adminGetAllUsers])
+    
     const handleUserCreated = (newUserData) => {
         setUsers(prev => [newUserData, ...prev])
         setIsCreatingUser(false)
@@ -37,7 +41,7 @@ const AdminPanel = () => {
     const handleDeleteUser = async (id) => {
         if (!window.confirm('Delete this user?')) return
         try {
-            await api.delete(`/admin/users/${id}`)
+            await adminDeleteUser(id)
             setUsers(prev => prev.filter(u => u._id !== id))
         } catch (err) {
             setError('Failed to delete user')
@@ -47,7 +51,7 @@ const AdminPanel = () => {
     const handleDeleteBooking = async (id) => {
         if (!window.confirm('Delete this booking?')) return
         try {
-            await api.delete(`/admin/bookings/${id}`)
+            await adminDeleteBooking(id)
             setBookings(prev => prev.filter(b => b._id !== id))
         } catch (err) {
             setError('Failed to delete booking')
@@ -60,14 +64,14 @@ const AdminPanel = () => {
 
     const handleUpdateUser = async () => {
         try {
-            const res = await api.patch(`/admin/users/${editingUser._id}`, {
+            const updated = await adminUpdateUser(editingUser._id, {
                 name: editingUser.name,
                 email: editingUser.email,
                 role: editingUser.role,
                 is_active: editingUser.is_active,
                 is_verified: editingUser.is_verified
             })
-            setUsers(prev => prev.map(u => u._id === editingUser._id ? res.data : u))
+            setUsers(prev => prev.map(u => u._id === editingUser._id ? updated : u))
             setEditingUser(null)
         } catch (err) {
             setError('Failed to update user')
@@ -103,7 +107,22 @@ const AdminPanel = () => {
 
             {activeTab === 'users' && (
                 <div>
-                    
+                    <div className="mb-3 d-flex justify-content-end">
+                        <button 
+                            className="btn btn-success" 
+                            onClick={() => {
+                            setIsCreatingUser(true)
+                            setEditingUser(null) 
+                            }}>
+                        + Add New User
+                        </button>
+                    </div>
+                    {isCreatingUser && (
+                        <CreateUserForm 
+                            onSuccess={handleUserCreated} 
+                            onCancel={() => setIsCreatingUser(false)} 
+                        />
+                    )}
                     {editingUser && (
                         <div className="card mb-4 border shadow-sm">
                             <div className="card-body">
@@ -204,22 +223,7 @@ const AdminPanel = () => {
                     </table>
                 </div>
             )}
-            <div className="mb-3 d-flex justify-content-end">
-                <button 
-                    className="btn btn-success" 
-                    onClick={() => {
-                        setIsCreatingUser(true)
-                        setEditingUser(null) 
-                    }}>
-                    + Add New User
-                </button>
-            </div>
-            {isCreatingUser && (
-                <CreateUserForm 
-                    onSuccess={handleUserCreated} 
-                    onCancel={() => setIsCreatingUser(false)} 
-                />
-            )}
+            
             
             {/* bookings */}
             {activeTab === 'bookings' && (

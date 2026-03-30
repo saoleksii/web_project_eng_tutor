@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api from '../api/axios'
+import { useApi } from '../App'
 
 function Login() {
     const redirect = useNavigate()
+    const { login } = useApi()
     const [formData, setFormData] = useState({ email: '', password: '' })
     const [error, setError] = useState('')
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError('')
@@ -17,8 +19,7 @@ function Login() {
         if(!emailVal.test(formData.email)) return setError("Email is not valid")
 
         try {
-            const res = await api.post('/auth/login', formData)
-            const { token, user } = res.data
+            const { token, user } = await login(formData.email, formData.password)
             localStorage.setItem('token', token)
             localStorage.setItem('user', JSON.stringify(user))
             alert("Login successful")

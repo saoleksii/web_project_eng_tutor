@@ -1,39 +1,34 @@
 import { useState, useEffect } from 'react'
-import api from '../api/axios'
 import { useNavigate } from 'react-router-dom'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 import { isValidPhoneNumber } from 'libphonenumber-js'
+import { useApi } from '../App'
+import { uploadPhoto } from '../api/upload'
 
 const Profile = () => {
     const navigate = useNavigate()
+    const { getProfile, updateProfile } = useApi()
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
     
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        role: '',
-        description: '',
-        price: '',
-        education: '',
-        experience: '',
-        photo: ''
+        name: '', email: '', phone: '', role: '',
+        description: '', price: '', education: '', experience: '', photo: ''
     })
 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await api.get('/user')
-                setFormData(res.data)
+                const data = await getProfile()
+                setFormData(data)
             } catch (err) {
                 console.error("Loading error:", err)
                 setError('Failed to load profile.')
             }
         };
         fetchProfile()
-    }, [])
+    }, [getProfile])
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -41,12 +36,21 @@ const Profile = () => {
 
     const handlePhotoChange = async (e) => {
         const file = e.target.files[0]
+        if (!file) {
+            console.log("Choose a file")
+            return
+        }
         const uploadData = new FormData()
         uploadData.append('photo', file)
         try {
-            const res = await api.post('/upload', uploadData, {headers: { 'Content-Type': 'multipart/form-data' }})
-            setFormData({ ...formData, photo: res.data.photo_url })
+            const res = await uploadPhoto(file)
+            const newPhoto = res.data?.photo_url || res.photo_url
+            setFormData({ ...formData, photo: newPhoto })
             alert("Photo saved!")
+
+            await updateProfile({
+                photo: newPhoto
+            })
         } catch (err) {
             console.error("Upload error", err)
         }
@@ -59,7 +63,7 @@ const Profile = () => {
 
         try {
             if(!isValidPhoneNumber('+' + formData.phone)) return setError("Phone is not valid")
-            await api.patch('/user', formData)
+            await updateProfile(formData)
             setSuccess('Profile updated!')
         
             const storedUser = JSON.parse(localStorage.getItem('user'))

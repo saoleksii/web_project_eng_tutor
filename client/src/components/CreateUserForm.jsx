@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import api from '../api/axios'
+import { useApi } from '../App'
 
 const CreateUserForm = ({ onSuccess, onCancel }) => {
+    const { adminCreateUser } = useApi()
     const [newUser, setNewUser] = useState({
         name: '', email: '', password: '', phone: '', role: 'student'
     })
@@ -12,8 +13,8 @@ const CreateUserForm = ({ onSuccess, onCancel }) => {
         setError('')
         
         try {
-            const res = await api.post('/admin/users', newUser)
-            onSuccess(res.data.user)
+            const user = await adminCreateUser(newUser)
+            onSuccess(user)
             alert("New user created!")
         } catch (err) {
             setError(err.response?.data?.error || 'Failed to create user')

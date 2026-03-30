@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import api from '../api/axios'
+import { useApi } from '../App'
 import { useNavigate } from 'react-router-dom'
 
 const TutorCard = ({ tutor }) => {
+    const { createBooking } = useApi()
     const navigate = useNavigate()
     const [isExpanded, setIsExpanded] = useState(false)
     const [showForm, setShowForm] = useState(false)
@@ -22,7 +23,7 @@ const TutorCard = ({ tutor }) => {
         }
 
         try {
-            await api.post('/bookings', {
+            await createBooking({
                 tutor_id: tutor._id,
                 date: bookingData.date,
                 time: bookingData.time
@@ -31,7 +32,11 @@ const TutorCard = ({ tutor }) => {
             setBookingData({ date: '', time: '' })
             setShowForm(false)
         } catch (err) {
-            setError(err.response?.data?.message || 'Booking error')
+            const msg = err.graphQLErrors?.[0]?.message ||
+                err.response?.data?.message ||
+                err.message ||
+                "Booking error"
+            setError(msg)
         }
     }
     const formatDescription = (text) => {

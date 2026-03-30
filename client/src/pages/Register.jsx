@@ -1,15 +1,18 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api from '../api/axios'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 import { isValidPhoneNumber } from 'libphonenumber-js'
+import { useApi } from '../App'
 
 function Register() {
     const [formData, setFormData] = useState(
-        { name: '', email: '', password: '', phone: '', role: 'student'})
+        { name: '', email: '', password: '', phone: '', role: 'student'}
+    )
     const [error, setError] = useState('')
     const redirect = useNavigate()
+    const { register } = useApi()
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError('')
@@ -22,8 +25,8 @@ function Register() {
         if(!isValidPhoneNumber('+' + formData.phone)) return setError("Phone is not valid")
 
         try {
-            const res = await api.post('/auth/register', formData)
-            alert(res.data.message)
+            await register(formData)
+            alert("Confirm your email!")
             redirect('/login')
         } catch (err) {
             setError(err.response?.data?.message || "Registration error")

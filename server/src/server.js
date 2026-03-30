@@ -36,19 +36,19 @@ app.use((req, res, next) => {
 const start = async () => {
     try{
         await connectDB()
+        const upload_routes = require('./routes/upload')
+        app.use('/api', upload_routes)
         if (api_mode == "rest") {
             console.log("API MODE: REST")
             const auth_routes = require('./routes/auth_routes')
             const admin_routes = require('./routes/admin_routes')
             const user_routes = require('./routes/user_routes')
             const booking_routes = require('./routes/booking_routes')
-            const upload_routes = require('./routes/upload')
 
             app.use('/api/auth', auth_routes)
             app.use('/api/admin', admin_routes)
             app.use('/api', user_routes)
             app.use('/api/bookings', booking_routes)
-            app.use('/api', upload_routes)
         } else{
             console.log("API MODE: GRAPHQL")
             const { verify_email } = require('./controllers/auth_controller');

@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
-import api from '../api/axios'
 import { useSearchParams } from 'react-router-dom'
 import TutorCard from '../components/TutorCard'
+import { useApi } from '../App'
 
 function Start() {
+    const { getTutors } = useApi()
     const [tutorData, setTutorData] = useState([])
     const [params, setParams] = useSearchParams()
     useEffect(() => {
-        api.get('/tutors').then(res => setTutorData(res.data))
-    }, [])
+        getTutors().then(data => setTutorData(data))
+    }, [getTutors])
     const query = {
         name: params.get('name') || '',
         price: params.get('maxPrice') || '',
@@ -34,7 +35,7 @@ function Start() {
                         className="form-control form-control-lg shadow-sm" 
                         placeholder="Search for a tutor"
                         value={query.name}
-                        onChange={e => update('name', e.target.value)}s
+                        onChange={e => update('name', e.target.value)}
                     />
                     <input
                         type="number"

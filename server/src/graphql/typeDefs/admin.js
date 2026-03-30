@@ -4,7 +4,13 @@ const Admin = `#graphql
         get_all_bookings: [Booking!]!
     }
     type Mutation {
-        create_user: User!
+        create_user(
+            name: String!
+            email: String!
+            password: String!
+            phone: String!
+            role: String
+        ): User!
         delete_user(id: ID!): Boolean!
         update_user(
             id: ID!

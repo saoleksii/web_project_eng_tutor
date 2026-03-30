@@ -11,7 +11,7 @@ const admin_resolvers = {
         },
         get_all_bookings: async(parent, args, context) => {
             if (!context.user || context.user.role !== 'admin') throw new GraphQLError("No access", { extensions: { code: 'FORBIDDEN' }})
-            return await booking_model.find()
+            return await booking_model.find().populate('student_id tutor_id')
         }
     },
     Mutation: {
@@ -27,7 +27,7 @@ const admin_resolvers = {
             if(!user) throw new Error('User not found')
             return true
         },
-        update_user: async(parent, args, contect) => {
+        update_user: async(parent, args, context) => {
             if (!context.user || context.user.role !== 'admin') throw new GraphQLError("No access", { extensions: { code: 'FORBIDDEN' }})
             const { id, ...updates } = args
             const user = await user_model.findByIdAndUpdate(id, updates, {new: true})
@@ -36,7 +36,7 @@ const admin_resolvers = {
         },
         delete_booking: async(parent, { id }, context) => {
             if (!context.user || context.user.role !== 'admin') throw new GraphQLError("No access", { extensions: { code: 'FORBIDDEN' }})
-            const booking = await user_model.findByIdAndDelete(id)
+            const booking = await booking_model.findByIdAndDelete(id)
             if(!booking) throw new Error('Booking not found')
             return true
         }

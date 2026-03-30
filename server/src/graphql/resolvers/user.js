@@ -17,7 +17,6 @@ const transport = nodemailer.createTransport({
 const user_resolver = {
     Query: {
         get_tutors: async (parent, args, context) => {
-            if(!context.user) return null
             return await user_model.find({role: 'tutor', is_active: true})
         },
         get_user: async (parent, args, context) => {
