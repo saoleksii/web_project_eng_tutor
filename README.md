@@ -62,7 +62,7 @@ web_project_eng_tutor/
 
 ### 1. Clone the repository
 ```bash
-git clone <your-repo-url>
+git clone ...
 cd web_project_eng_tutor
 ```
 
